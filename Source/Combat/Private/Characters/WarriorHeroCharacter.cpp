@@ -2,11 +2,15 @@
 
 
 #include "Characters/WarriorHeroCharacter.h"
-#include "WarriorDebugHelper.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "EnhancedInputSubsystems.h"
+#include "WarriorDebugHelper.h"
+#include "WarriorGameplayTags.h"
+#include "Components/Inputs/WarriorInputComponent.h"
+#include "DataAssets/Input/DataAsset_InputConfig.h"
 
 AWarriorHeroCharacter::AWarriorHeroCharacter()
 {
@@ -34,9 +38,46 @@ AWarriorHeroCharacter::AWarriorHeroCharacter()
 	
 }
 
+void AWarriorHeroCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
+{
+	checkf(InputConfigDataAsset, TEXT("Forget to assign a valid data asset as "))
+	// 1. add mapping context
+	ULocalPlayer* LocalPlayer = GetController<APlayerController>()->GetLocalPlayer();
+    UEnhancedInputLocalPlayerSubsystem* Subsystem =	ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(LocalPlayer);
+
+	check(Subsystem);
+	// 2. bind input action to callback
+
+	Subsystem->AddMappingContext(InputConfigDataAsset->DefaultMappingContext, 0);
+
+	UWarriorInputComponent* WarriorInputComponent = CastChecked<UWarriorInputComponent>(PlayerInputComponent);
+
+	WarriorInputComponent->BindNativeInputAction(InputConfigDataAsset, WarriorGameplayTags::InputTag_Move, ETriggerEvent::Triggered, this, &ThisClass::Input_Move );
+	
+	
+}
+
 void AWarriorHeroCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	Debug::Print(TEXT("working"));
+}
+
+void AWarriorHeroCharacter::Input_Move(const FInputActionValue& InputActionValue)
+{
+	const FVector2D MovementVector = InputActionValue.Get<FVector2d>();
+	const FRotator MovementRotation(0.f, Controller->GetControlRotation().Yaw, 0.f);
+	if (MovementVector.Y != 0.f)
+	{
+		const FVector ForwardDirection = MovementRotation.RotateVector(FVector::ForwardVector);
+		AddMovementInput(ForwardDirection, MovementVector.Y);
+		
+	}
+
+	if (MovementVector.X!= 0.f)
+	{
+		const FVector RightDirection = MovementRotation.RotateVector(FVector::RightVector);
+		AddMovementInput(RightDirection, MovementVector.X);
+	}
 }
 
