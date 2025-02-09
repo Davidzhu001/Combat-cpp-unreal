@@ -3,23 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "DataAssets/StartupData/DataAsset_StartPDataBase.h"
+#include "WarriorTypes/WarriorStructTypes.h"
+#include "DataAssets/StartupData//DataAsset_StartPDataBase.h"
 #include "DataAsset_HeroStartPData.generated.h"
 
-USTRUCT(BlueprintType)
-struct FwarriorHeroAbilitySet
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(ToolTip="InputTag"))
-	FGameplayTag InputTag;
-
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSubclassOf<UWarriorGameplayAbility> AbilityToGrant;
-
-	bool IsValid() const;
-};
 /**
  * 
  */
