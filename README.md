@@ -9,4 +9,6 @@
 
 ![alt text](docs/images/gas2.png)
 
+### 新技能的流程
 
+![img.png](img.png)
